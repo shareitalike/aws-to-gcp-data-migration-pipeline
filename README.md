@@ -1,6 +1,6 @@
 # Cloud Data Migration & Modernization Platform
 ### AWS-to-GCP Data Engineering Pipeline — RetailEdge Global Pvt Ltd
-**Delivered by: Vipra Soft Pvt Limited | Engagement Period: January 2024 – June 2025**
+**Delivered by: Cloud Data Architecture Group | Engagement Period: January 2024 – June 2025**
 
 ---
 
@@ -8,7 +8,7 @@
 
 RetailEdge Global Pvt Ltd (500+ stores, ₹1,200 Cr annual revenue) had its entire analytical data infrastructure locked inside AWS S3 — daily batch files from their order management system, user event logs, and customer segmentation data. Analytical queries were slow, expensive, and inaccessible to business stakeholders without engineering intervention.
 
-**Vipra Soft designed and delivered a production-grade, end-to-end cloud data migration and modernization platform** on Google Cloud Platform — migrating 100K+ daily transactional records from AWS S3 to BigQuery, with a full Medallion data architecture, automated data quality enforcement, and real-time observability.
+**Designed and delivered a production-grade, end-to-end cloud data migration and modernization platform** on Google Cloud Platform — migrating 100K+ daily transactional records from AWS S3 to BigQuery, with a full Medallion data architecture, automated data quality enforcement, and real-time observability.
 
 ---
 
@@ -190,6 +190,4 @@ gcloud composer environments run retailedge-composer \
 | **Cloud Infrastructure Engineer** | Terraform, IAM, networking, Cloud Composer setup |
 | **Business Analyst** | Data contract negotiations, stakeholder alignment, UAT |
 
----
-
-*This repository represents a production consulting deliverable. All code, documentation, and architectural decisions reflect real-world enterprise data engineering standards as practiced by Vipra Soft Pvt Limited.*
+*This repository represents a production consulting deliverable. All code, documentation, and architectural decisions reflect real-world enterprise data engineering standards.*

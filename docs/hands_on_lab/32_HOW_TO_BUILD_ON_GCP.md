@@ -1,5 +1,5 @@
 # GCP Hands-On Implementation Lab Guide
-### Build the RetailEdge Global Pipeline from Scratch | Vipra Soft Pvt Limited
+### Build the RetailEdge Global Pipeline from Scratch
 
 This document is your step-by-step practical guide to building, configuring, deploying, and running the entire AWS-to-GCP RetailEdge data pipeline on a live Google Cloud Platform (GCP) account. 
 
