@@ -1,7 +1,7 @@
 """
 RetailEdge Global — PySpark Daily Enrichment Job
 =================================================
-Vipra Soft Pvt Limited | GCP Data Engineering Engagement
+Cloud Data Architecture Group | GCP Data Engineering Engagement
 
 Purpose:
     Reads validated daily Parquet files from GCS, performs multi-source
@@ -41,12 +41,12 @@ logger = logging.getLogger("retailedge.enrichment")
 # ── Configuration ──────────────────────────────────────────────────────────────
 CONFIGS = {
     "prod": {
-        "validated_bucket": "gs://retailedge-validated-prod",
-        "processed_bucket": "gs://retailedge-processed-prod",
+        "validated_bucket": "gs://retailedge-landing-validated-aws-to-gcp-data-migration",
+        "processed_bucket": "gs://retailedge-processed-aws-to-gcp-data-migration",
     },
     "dev": {
-        "validated_bucket": "gs://retailedge-validated-dev",
-        "processed_bucket": "gs://retailedge-processed-dev",
+        "validated_bucket": "gs://retailedge-landing-validated-aws-to-gcp-data-migration",
+        "processed_bucket": "gs://retailedge-processed-aws-to-gcp-data-migration",
     },
 }
 
@@ -145,7 +145,9 @@ def read_segments(spark: SparkSession, validated_bucket: str) -> DataFrame:
     path = f"{validated_bucket}/segments/"
     logger.info(f"Reading user segments from: {path}")
     df = spark.read.parquet(path)
-    logger.info(f"User segments loaded: {df.count():,} rows")
+    # Rename the source column 'segment' to the expected 'user_segment' for downstream joins
+    df = df.withColumnRenamed("segment", "user_segment")
+    logger.info(f"User segments loaded: {df.count():,} rows (renamed column) ")
     return df
 
 

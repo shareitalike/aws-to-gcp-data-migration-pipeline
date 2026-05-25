@@ -1,5 +1,5 @@
 # Project Master Index
-### RetailEdge Global — GCP Data Platform | Vipra Soft Pvt Limited
+### RetailEdge Global — GCP Data Platform
 
 > **Start here.** This document is your navigation guide to everything in this repository.
 

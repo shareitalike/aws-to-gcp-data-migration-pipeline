@@ -1,7 +1,7 @@
 """
 RetailEdge Global — Cloud Run File Validation Service
 ======================================================
-Vipra Soft Pvt Limited | GCP Data Engineering Engagement
+Cloud Data Architecture Group | GCP Data Engineering Engagement
 
 Purpose:
     Event-driven validation gate triggered by GCS object creation events.
@@ -68,7 +68,7 @@ EXPECTED_SCHEMAS: dict[str, dict[str, dict]] = {
         "event_id":     {"parquet_type": "BYTE_ARRAY",    "required": True},
         "user_id":      {"parquet_type": "BYTE_ARRAY",    "required": True},
         "event_type":   {"parquet_type": "BYTE_ARRAY",    "required": True},
-        "event_time":   {"parquet_type": "INT64",         "required": True},
+        "timestamp":    {"parquet_type": "BYTE_ARRAY",    "required": True},
     },
     "user_segments": {
         "user_id":      {"parquet_type": "BYTE_ARRAY",    "required": True},
@@ -91,11 +91,11 @@ def detect_file_type(object_name: str) -> Optional[str]:
         One of: "orders", "events", "user_segments", or None if unrecognised.
     """
     lower = object_name.lower()
-    if "/orders/" in lower:
+    if "orders/" in lower:
         return "orders"
-    if "/events/" in lower:
+    if "events/" in lower:
         return "events"
-    if "/segments/" in lower or "/user_segments/" in lower:
+    if "segments/" in lower or "user_segments/" in lower:
         return "user_segments"
     logger.warning(f"Unrecognised file path, cannot detect file type: {object_name}")
     return None

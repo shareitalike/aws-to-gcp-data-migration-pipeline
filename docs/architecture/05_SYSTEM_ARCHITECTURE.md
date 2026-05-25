@@ -2,7 +2,7 @@
 
 **Document Type:** Architecture Reference  
 **Client:** RetailEdge Global Pvt Ltd  
-**Prepared By:** Vipra Soft Pvt Limited
+**Prepared By:** Cloud Data Architecture Group
 
 ---
 

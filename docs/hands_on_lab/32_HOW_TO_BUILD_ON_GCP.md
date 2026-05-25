@@ -324,8 +324,8 @@ gcloud dataproc batches submit pyspark gs://retailedge-processed-$PROJECT_ID/cod
     --batch="test-pyspark-batch-001" `
     --service-account=$SA_EMAIL `
     -- `
-    --date 2025-06-01 `
-    --env prod
+    --date=2025-06-01 `
+    --env=prod
 ```
 *Tip: You can monitor batch runs on the [Dataproc Batches Page in Google Cloud Console](https://console.cloud.google.com/dataproc/batches).*
 
@@ -498,6 +498,67 @@ FROM `aws-to-gcp-data-migration.core.enriched_orders`
 GROUP BY 1, 2
 ORDER BY 1, 3 DESC;
 ```
+
+---
+
+## 🔄 Optional Module: Production Cross-Cloud Ingestion via Storage Transfer Service (STS)
+
+This optional section guides you through configuring a live cross-cloud transfer from AWS S3 to your GCS raw bucket using GCP's native Storage Transfer Service (STS).
+
+### 1. Set up your AWS S3 Bucket
+1. Log in to your **AWS Management Console**.
+2. Navigate to the **S3** service and click **Create bucket**.
+3. Name your bucket (e.g., `retailedge-oms-export-YOURNAME`). Choose your preferred AWS region (e.g., `ap-south-1` for Mumbai).
+4. Create the following folders inside the bucket:
+   *   `orders/`
+   *   `events/`
+5. Upload your mock daily files from your local project into the respective S3 folders:
+   *   Local `01_sample_data/output_data/orders.parquet` ──► S3 `orders/orders_2025-06-01.parquet`
+   *   Local `01_sample_data/output_data/events.parquet` ──► S3 `events/events_2025-06-01.parquet`
+
+### 2. Create AWS IAM Credentials for GCP Access
+1. Go to the **IAM** service in the AWS Console.
+2. Click **Users** on the left menu, then click **Create user**.
+3. Name the user `gcp-sts-transfer-user` and click **Next**.
+4. Select **Attach policies directly** and click **Create policy**.
+5. Switch to the **JSON** tab in the policy creator and paste the following policy (replace `retailedge-oms-export-YOURNAME` with your actual S3 bucket name):
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:GetBucketLocation"
+            ],
+            "Resource": "arn:aws:s3:::retailedge-oms-export-YOURNAME"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": "arn:aws:s3:::retailedge-oms-export-YOURNAME/*"
+        }
+    ]
+}
+```
+6. Name the policy `GCP_STS_Read_Policy` and save it.
+7. Go back to your user creation wizard, search for `GCP_STS_Read_Policy`, select it, and finish creating the user.
+8. Click on your newly created user (`gcp-sts-transfer-user`), navigate to the **Security credentials** tab, and click **Create access key**.
+9. Select **Application running outside AWS** and download the generated **Access Key ID** and **Secret Access Key**.
+
+### 3. Configure and Run the Transfer Job in GCP
+1. Go to the **Google Cloud Storage Transfer Service** page in the GCP Console.
+2. Click **Create Transfer Job**.
+3. Select **Amazon S3** as source:
+   *   Enter your bucket: `retailedge-oms-export-YOURNAME`
+   *   Provide the **AWS Access Key ID** and **Secret Access Key**.
+4. Select **Google Cloud Storage** as destination:
+   *   Browse and select your raw GCS bucket: `retailedge-landing-raw-aws-to-gcp-data-migration`.
+5. Select **Run once** and trigger the job.
+6. Once the status shows **Success**, verify the files are successfully copied in your GCS Raw bucket!
 
 ---
 

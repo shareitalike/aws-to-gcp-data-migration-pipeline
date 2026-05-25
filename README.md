@@ -1,6 +1,6 @@
 # Cloud Data Migration & Modernization Platform
 ### AWS-to-GCP Data Engineering Pipeline — RetailEdge Global Pvt Ltd
-**Delivered by: Cloud Data Architecture Group | Engagement Period: January 2024 – June 2025**
+**Delivered by: Cloud Data Architecture Group**
 
 ---
 

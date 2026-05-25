@@ -1,6 +1,6 @@
 -- RetailEdge Global — dbt Incremental Model: enriched_orders
 -- =============================================================
--- Vipra Soft Pvt Limited | GCP Data Engineering Engagement
+-- GCP Data Engineering Engagement
 --
 -- Purpose:
 --     MERGE staging.orders_daily into core.enriched_orders.

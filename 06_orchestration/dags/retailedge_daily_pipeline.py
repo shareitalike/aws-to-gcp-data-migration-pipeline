@@ -1,7 +1,7 @@
 """
-RetailEdge Global — Cloud Composer Airflow DAG
+Cloud Composer Airflow DAG
 ===============================================
-Vipra Soft Pvt Limited | GCP Data Engineering Engagement
+GCP Data Engineering Engagement
 
 DAG: retailedge_daily_pipeline
 Schedule: Daily at 00:00 IST (18:30 UTC)
@@ -122,7 +122,7 @@ def sla_miss_callback(dag, task_list, blocking_task_list, slas, blocking_tis) ->
 
 # ── Default Task Arguments ─────────────────────────────────────────────────────
 default_args: dict[str, Any] = {
-    "owner":              "vipra-soft-data-team",
+    "owner":              "retailedge-data-team",
     "depends_on_past":    False,
     "start_date":         days_ago(1),
     "email_on_failure":   False,
@@ -147,7 +147,7 @@ with DAG(
     schedule_interval="30 18 * * *",   # 18:30 UTC = 00:00 IST
     catchup=False,
     max_active_runs=1,                 # Prevent concurrent runs for the same pipeline
-    tags=["retailedge", "daily", "production", "vipra-soft"],
+    tags=["retailedge", "daily", "production"],
     on_success_callback=on_success_callback,
     sla_miss_callback=sla_miss_callback,
 ) as dag:

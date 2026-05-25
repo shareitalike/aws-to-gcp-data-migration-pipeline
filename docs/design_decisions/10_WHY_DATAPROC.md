@@ -2,7 +2,7 @@
 
 **Category:** Processing Engine  
 **Decision Date:** February 2024  
-**Decision Owner:** Lead Data Engineer (Vipra Soft)  
+**Decision Owner:** Lead Data Engineer  
 **Status:** Approved & Implemented
 
 ---

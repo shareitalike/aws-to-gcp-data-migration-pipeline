@@ -16,4 +16,4 @@ COPY validate_landing.py .
 ENV PORT=8080
 EXPOSE 8080
 
-CMD ["functions-framework", "--target", "process_gcs_event", "--signature-type", "cloudevent"]
+CMD ["functions-framework", "--target", "process_gcs_event", "--signature-type", "cloudevent", "--source", "validate_landing.py"]

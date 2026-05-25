@@ -1,7 +1,7 @@
 """
 RetailEdge Global — BigQuery Staging Load & Production MERGE
 =============================================================
-Vipra Soft Pvt Limited | GCP Data Engineering Engagement
+Cloud Data Architecture Group | GCP Data Engineering Engagement
 
 Purpose:
     1. load_staging(): Load date-partitioned Parquet from GCS Processed into
