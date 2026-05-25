@@ -1,0 +1,93 @@
+version: 2
+
+models:
+  - name: enriched_orders
+    description: >
+      Production analytics table for RetailEdge Global.
+      Contains enriched order records joined with user segments and event metrics.
+      Partitioned by process_date. Clustered by user_segment, user_id.
+      
+      Data lineage:
+        AWS S3 (OMS) → GCS Raw → Cloud Run Validation → GCS Validated
+        → PySpark Dataproc → GCS Processed → BQ Staging → THIS TABLE
+
+    config:
+      contract:
+        enforced: true
+
+    columns:
+      - name: order_id
+        description: "Unique order identifier from the OMS system. Natural key."
+        data_type: string
+        constraints:
+          - type: not_null
+          - type: unique
+        tests:
+          - not_null
+          - unique
+
+      - name: user_id
+        description: "Loyalty program user ID. Links to user_segments dimension."
+        data_type: string
+        tests:
+          - not_null
+
+      - name: amount
+        description: "Order transaction amount in the specified currency. Zero-amount orders are filtered."
+        data_type: float64
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+
+      - name: currency
+        description: "ISO 4217 currency code. Normalised to uppercase."
+        data_type: string
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['INR', 'USD', 'EUR', 'GBP']
+
+      - name: process_date
+        description: "Business date of the order batch. Partition key. Used for partition pruning in all queries."
+        data_type: date
+        tests:
+          - not_null
+
+      - name: user_segment
+        description: "Customer loyalty segment classification. Defaults to 'unclassified' if no segment found."
+        data_type: string
+        tests:
+          - not_null
+
+      - name: event_count
+        description: "Total number of user events (page views, add-to-cart, checkout) recorded on the order date."
+        data_type: integer
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+      - name: event_types
+        description: "Array of unique event type labels for this user on the order date."
+        data_type: array<string>
+
+      - name: updated_at
+        description: "Timestamp of last MERGE operation. Updated every dbt run."
+        data_type: timestamp
+        tests:
+          - not_null
+
+sources:
+  - name: staging
+    description: "Ephemeral daily staging tables loaded from GCS Processed Parquet by the Airflow BQ load task."
+    tables:
+      - name: orders_daily
+        description: >
+          Daily staging table for enriched orders.
+          Loaded via BigQuery load job with WRITE_TRUNCATE — wiped and reloaded every run.
+          This table is the source for the enriched_orders MERGE.
+        freshness:
+          warn_after: {count: 25, period: hour}
+          error_after: {count: 30, period: hour}
+        loaded_at_field: process_date
