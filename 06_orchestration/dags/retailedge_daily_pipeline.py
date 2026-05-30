@@ -53,13 +53,13 @@ from airflow.utils.dates import days_ago
 import requests
 
 # ── Configuration ──────────────────────────────────────────────────────────────
-PROJECT_ID         = Variable.get("gcp_project_id", default_var="retailedge-data-prod")
+PROJECT_ID         = Variable.get("gcp_project_id", default_var="aws-to-gcp-data-migration")
 GCP_REGION         = "asia-south1"
 DATAPROC_REGION    = GCP_REGION
-GCS_RAW_BUCKET     = Variable.get("gcs_raw_bucket", default_var="retailedge-raw-prod")
-GCS_VALIDATED_BUCKET = Variable.get("gcs_validated_bucket", default_var="retailedge-validated-prod")
-GCS_PROCESSED_BUCKET = Variable.get("gcs_processed_bucket", default_var="retailedge-processed-prod")
-SPARK_JOB_FILE     = f"gs://retailedge-code-prod/pyspark/process_daily_orders.py"
+GCS_RAW_BUCKET     = Variable.get("gcs_raw_bucket", default_var="retailedge-landing-aws-to-gcp-data-migration")
+GCS_VALIDATED_BUCKET = Variable.get("gcs_validated_bucket", default_var="retailedge-landing-validated-aws-to-gcp-data-migration")
+GCS_PROCESSED_BUCKET = Variable.get("gcs_processed_bucket", default_var="retailedge-processed-aws-to-gcp-data-migration")
+SPARK_JOB_FILE     = f"gs://retailedge-processed-aws-to-gcp-data-migration/code/process_daily_orders.py"
 SLACK_WEBHOOK_URL  = Variable.get("slack_webhook_url", default_var="")
 
 # AWS S3 Source Configuration
@@ -225,6 +225,7 @@ with DAG(
     load_bq_staging = BigQueryInsertJobOperator(
         task_id="load_bq_staging",
         project_id=PROJECT_ID,
+        location="asia-south1",          # ← required: dataset lives in asia-south1, not US
         configuration={
             "load": {
                 "sourceUris":    [f"{GCS_PROCESSED_BUCKET}/enriched_orders/process_date={{{{ ds }}}}/*.parquet"],

@@ -14,6 +14,7 @@ models:
     config:
       contract:
         enforced: true
+      on_schema_change: append_new_columns
 
     columns:
       - name: order_id
@@ -81,13 +82,16 @@ models:
 sources:
   - name: staging
     description: "Ephemeral daily staging tables loaded from GCS Processed Parquet by the Airflow BQ load task."
+    database: aws-to-gcp-data-migration
+    schema: staging
     tables:
       - name: orders_daily
         description: >
           Daily staging table for enriched orders.
           Loaded via BigQuery load job with WRITE_TRUNCATE — wiped and reloaded every run.
           This table is the source for the enriched_orders MERGE.
-        freshness:
-          warn_after: {count: 25, period: hour}
-          error_after: {count: 30, period: hour}
         loaded_at_field: process_date
+        config:
+          freshness:
+            warn_after: {count: 25, period: hour}
+            error_after: {count: 30, period: hour}

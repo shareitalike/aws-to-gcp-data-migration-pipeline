@@ -1,0 +1,13 @@
+retailedge_dbt_project:
+  target: prod
+  outputs:
+    prod:
+      type: bigquery
+      method: oauth
+      project: aws-to-gcp-data-migration
+      dataset: core
+      location: asia-south1
+      threads: 4
+      timeout_seconds: 300
+      priority: interactive
+      retries: 1

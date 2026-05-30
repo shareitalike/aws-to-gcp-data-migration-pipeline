@@ -48,10 +48,13 @@ WITH staging_orders AS (
         user_id,
         amount,
         currency,
-        process_date,
+        DATE('{{ var("execution_date") }}') AS process_date,
         user_segment,
         event_count,
-        event_types
+        ARRAY_TO_STRING(
+            ARRAY(SELECT e.element FROM UNNEST(event_types.list) AS e),
+            ','
+        ) AS event_types
     FROM {{ source('staging', 'orders_daily') }}
 
     {% if is_incremental() %}

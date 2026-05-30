@@ -35,8 +35,8 @@ logging.basicConfig(
 logger = logging.getLogger("retailedge.warehouse")
 
 # ── Configuration ──────────────────────────────────────────────────────────────
-PROJECT_ID        = os.environ.get("GCP_PROJECT_ID", "retailedge-data-prod")
-PROCESSED_BUCKET  = os.environ.get("PROCESSED_BUCKET", "gs://retailedge-processed-prod")
+PROJECT_ID        = os.environ.get("GCP_PROJECT_ID", "aws-to-gcp-data-migration")
+PROCESSED_BUCKET  = os.environ.get("PROCESSED_BUCKET", "gs://retailedge-processed-aws-to-gcp-data-migration")
 STAGING_DATASET   = "staging"
 STAGING_TABLE     = "orders_daily"
 PRODUCTION_DATASET = "core"
@@ -70,6 +70,12 @@ def load_staging(execution_date: str) -> None:
         execution_date: Date in YYYY-MM-DD format (Airflow {{ ds }}).
     """
     client = bigquery.Client(project=PROJECT_ID)
+
+    # Auto-create the staging dataset if it doesn't exist
+    dataset_ref = bigquery.Dataset(f"{PROJECT_ID}.{STAGING_DATASET}")
+    dataset_ref.location = "asia-south1"
+    client.create_dataset(dataset_ref, exists_ok=True)
+    logger.info(f"Staging dataset '{STAGING_DATASET}' ready (created or already exists)")
 
     source_uri      = f"{PROCESSED_BUCKET}/enriched_orders/process_date={execution_date}/*.parquet"
     destination_ref = f"{PROJECT_ID}.{STAGING_DATASET}.{STAGING_TABLE}"
@@ -137,13 +143,25 @@ def merge_production(execution_date: str) -> None:
     merge_sql = f"""
     MERGE INTO {target_table} AS target
     USING (
-        SELECT *
+        -- process_date is the Spark partition folder name, not a column in the Parquet file.
+        -- We inject it as a literal DATE so the staging rows carry the correct date value.
+        SELECT
+            order_id,
+            user_id,
+            amount,
+            currency,
+            DATE('{execution_date}') AS process_date,
+            user_segment,
+            event_count,
+            ARRAY_TO_STRING(
+                ARRAY(SELECT e.element FROM UNNEST(event_types.list) AS e),
+                ','
+            ) AS event_types
         FROM {source_table}
-        WHERE process_date = '{execution_date}'
     ) AS source
 
-    ON target.order_id     = source.order_id
-    AND target.process_date = source.process_date  -- For partition pruning (not correctness)
+    ON target.order_id      = source.order_id
+    AND target.process_date = source.process_date   -- partition pruning (not correctness)
 
     WHEN MATCHED THEN
         UPDATE SET
