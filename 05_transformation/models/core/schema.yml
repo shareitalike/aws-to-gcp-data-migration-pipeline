@@ -39,7 +39,8 @@ models:
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              expression: "> 0"
+              arguments:
+                expression: "> 0"
 
       - name: currency
         description: "ISO 4217 currency code. Normalised to uppercase."
@@ -47,7 +48,8 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['INR', 'USD', 'EUR', 'GBP']
+              arguments:
+                values: ['INR', 'USD', 'EUR', 'GBP']
 
       - name: process_date
         description: "Business date of the order batch. Partition key. Used for partition pruning in all queries."
@@ -67,7 +69,8 @@ models:
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              expression: ">= 0"
+              arguments:
+                expression: ">= 0"
 
       - name: event_types
         description: "Array of unique event type labels for this user on the order date."
@@ -90,8 +93,8 @@ sources:
           Daily staging table for enriched orders.
           Loaded via BigQuery load job with WRITE_TRUNCATE — wiped and reloaded every run.
           This table is the source for the enriched_orders MERGE.
-        loaded_at_field: process_date
         config:
+          loaded_at_field: process_date
           freshness:
             warn_after: {count: 25, period: hour}
             error_after: {count: 30, period: hour}

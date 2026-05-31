@@ -51,10 +51,7 @@ WITH staging_orders AS (
         DATE('{{ var("execution_date") }}') AS process_date,
         user_segment,
         event_count,
-        ARRAY_TO_STRING(
-            ARRAY(SELECT e.element FROM UNNEST(event_types.list) AS e),
-            ','
-        ) AS event_types
+        ARRAY(SELECT e.element FROM UNNEST(event_types.list) AS e) AS event_types
     FROM {{ source('staging', 'orders_daily') }}
 
     {% if is_incremental() %}

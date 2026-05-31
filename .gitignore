@@ -65,3 +65,14 @@ credentials/
 # Private Interview & Prep Documents
 docs/interview_prep/
 docs/consulting/
+docs/project aws_gcp _story_human way.txt
+docs/*.txt
+docs/snpas/
+
+
+# Local backup / Snapshots
+.snapshots/
+
+# Local Mock Datasets (Generated locally by scripts)
+01_sample_data/output_data/
+
