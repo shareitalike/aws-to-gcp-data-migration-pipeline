@@ -65,6 +65,7 @@ credentials/
 # Private Interview & Prep Documents
 docs/interview_prep/
 docs/consulting/
+docs/important/
 docs/project aws_gcp _story_human way.txt
 docs/*.txt
 docs/snpas/

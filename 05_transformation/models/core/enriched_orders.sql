@@ -37,6 +37,7 @@
             "granularity": "day"
         },
         cluster_by=['user_segment', 'user_id'],
+        require_partition_filter=True,
         on_schema_change='append_new_columns',
         tags=['daily', 'core', 'production']
     )
