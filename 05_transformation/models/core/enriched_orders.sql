@@ -29,7 +29,7 @@
 {{
     config(
         materialized='incremental',
-        unique_key='order_id',
+        unique_key=['process_date', 'order_id'],
         incremental_strategy='merge',
         partition_by={
             "field": "process_date",
@@ -55,11 +55,9 @@ WITH staging_orders AS (
         ARRAY(SELECT e.element FROM UNNEST(event_types.list) AS e) AS event_types
     FROM {{ source('staging', 'orders_daily') }}
 
-    {% if is_incremental() %}
-    -- Partition pruning: only process today's partition from staging
-    -- Limits MERGE target scan to the relevant production partition
-    WHERE process_date = '{{ var("execution_date") }}'
-    {% endif %}
+    -- Partition pruning: Because Airflow loads staging_orders using WRITE_TRUNCATE daily,
+    -- it only contains the current execution_date's data. 
+    -- BigQuery uses the target's process_date via the unique_key during the MERGE for pruning.
 ),
 
 -- Data quality layer: reject any rows that fail critical checks
