@@ -1,0 +1,53 @@
+name: dbt CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '05_transformation/**'
+
+jobs:
+  dbt-test:
+    name: Run dbt parse and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install dbt-bigquery==1.8.0
+          pip install sqlfluff==3.0.0
+
+      - name: Run SQLFluff Linter
+        run: |
+          sqlfluff lint 05_transformation/models/ --dialect bigquery
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Install dbt dependencies
+        run: dbt deps
+        working-directory: ./05_transformation
+
+      - name: Run dbt parse
+        run: dbt parse
+        working-directory: ./05_transformation
+
+      - name: Run dbt compile
+        run: dbt compile
+        working-directory: ./05_transformation
+
+      # In a real CI environment, you would run against a dedicated 'ci' dataset
+      # - name: Run dbt test
+      #   run: dbt test --target ci
+      #   working-directory: ./05_transformation

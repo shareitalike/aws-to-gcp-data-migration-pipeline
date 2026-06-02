@@ -37,7 +37,7 @@ The platform follows a **Medallion Architecture** (Bronze → Silver → Gold) w
 │   └── segments/user_segments_20250601.parquet                                   │
 │                                                                                 │
 │                    │ (GCS Event Trigger — fires in milliseconds)                │
-│                    ▼                                                             │
+│                    ▼                                                            │
 │   ┌──────────────────────────────────────────────────────┐                      │
 │   │           CLOUD RUN VALIDATOR                        │                      │
 │   │                                                      │                      │
@@ -64,9 +64,9 @@ The platform follows a **Medallion Architecture** (Bronze → Silver → Gold) w
 │   ├── Broadcast join: orders + agg_events + segments (on user_id)               │
 │   ├── Dedup: ROW_NUMBER() on order_id (keep latest)                             │
 │   ├── Business rules: filter zero-amount, cast types                            │
-│   ├── Quality gate: assert output_count ≤ input_count × 1.1                    │
-│   └── Write: gs://retailedge-processed-prod/enriched_orders/process_date=*/    │
-│              (Parquet, Snappy, date-partitioned, partitionOverwriteMode=dynamic) │
+│   ├── Quality gate: assert output_count ≤ input_count × 1.1                     │
+│   └── Write: gs://retailedge-processed-prod/enriched_orders/process_date=*/     │
+│              (Parquet, Snappy, date-partitioned, partitionOverwriteMode=dynamic)│
 └───────────────────────────────┬─────────────────────────────────────────────────┘
                                 │
                     [BigQueryInsertJobOperator]
@@ -95,7 +95,7 @@ The platform follows a **Medallion Architecture** (Bronze → Silver → Gold) w
 │          [dbt schema tests — circuit breaker]                                   │
 │          ├── not_null: order_id                                                 │
 │          ├── unique: order_id                                                   │
-│          └── accepted_values: currency in ['INR', 'USD']                       │
+│          └── accepted_values: currency in ['INR', 'USD']                        │
 └───────────────────────────────┬─────────────────────────────────────────────────┘
                                 │
                                 ▼
